@@ -1,1 +1,1 @@
-# Seminar-z-INFO na Gymnáziu Park mládeže 5 (Rok 2021/22)
+# Seminar z INFO na GPM (Rok 2021/22)
