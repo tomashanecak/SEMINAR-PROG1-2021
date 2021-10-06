@@ -1,8 +1,9 @@
 ## Absolutne zle som pochopil zadanie a nikto nevie ako to funguje ale nejako to funguje XDDDD
+## Ineficcient yet working
 import tkinter as tk
 import random as r
 
-canvas = tk.Canvas(width=1000,height=500)
+canvas = tk.Canvas(width=1000,height=800)
 canvas.pack()
 
 def checkAscending(num1, num2, switch):
@@ -22,17 +23,25 @@ rnd2 = r.randint(10, 10000)
 x = 100
 y = 20
 switch = 0
-canvas.create_text(x, y, text=rnd1)
+canvas.create_text(x, y, text=rnd1, fill="red", font=("italic", 20))
 
 
 for i in range(40):
     if checkAscending(rnd1, rnd2, switch) == 1:
-        x += 50
-        canvas.create_text(x, y, text=rnd2)
+        x += 100
+
+        if switch == 0:
+            canvas.create_text(x, y, text=rnd2, fill="green", font=("italic", 20))
+        else:
+            canvas.create_text(x, y, text=rnd1, fill="green", font=("italic", 20))
     else:
-        x = 10
-        y += 20
-        canvas.create_text(x, y, text=rnd2)
+        x = 100
+        y += 35
+
+        if switch == 0:
+            canvas.create_text(x, y, text=rnd2, fill="red", font=("italic", 20))
+        else:
+            canvas.create_text(x, y, text=rnd1, fill="red", font=("italic", 20))
 
     if switch == 0:
         rnd1 = r.randint(10, 10000)
