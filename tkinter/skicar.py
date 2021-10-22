@@ -5,7 +5,9 @@ from typing import Text
 
 w = 1200
 h = 700
+root = tk.Tk()
 canvas =tk.Canvas(width = w, height = h, background="white")
+root.title("Microsoft Draw Cyberpunk 2048 Edition")
 canvas.pack()
 
 color = "#ffffff"
@@ -14,8 +16,21 @@ line_start = 0
 old_line_x = 0
 old_line_y = 0
 
-canvas.create_line(0, 120, w, 120)
-canvas.create_line(0, h-120, w, h-120)
+clr_prev_rect = canvas.create_rectangle(850,20, 1030, 80, fill=color)
+
+def drawGui():
+    global clr_prev_rect
+    canvas.create_line(0, 120, w, 120)
+    canvas.create_line(0, h-120, w, h-120)
+    clr_prev_rect = canvas.create_rectangle(850,20, 1030, 80, fill=color)
+
+def newPaper():
+    canvas.delete("all")
+    drawGui()
+
+new_btn = tk.Button(canvas, text="New Paper", command=newPaper)
+new_btn.place(x=1050, y=40)
+
 slider_red = tk.Scale(from_ = 0, to = 255, tickinterval= 50, orient=tk.HORIZONTAL, length=200)
 slider_red.place(x=50, y=20)
 slider_green = tk.Scale(from_ = 0, to = 255, tickinterval= 50, orient=tk.HORIZONTAL, length=200)
@@ -32,7 +47,6 @@ slider_line.place(x=660, y=h-80)
 slider_erase = tk.Scale(from_ = 0, to = 100, tickinterval= 20, orient=tk.HORIZONTAL, length=200)
 slider_erase.place(x=940, y=h-80)
 
-clr_prev_rect = canvas.create_rectangle(850,20, 1030, 80, fill=color)
 def showColor():
     global slider_red, slider_green, slider_blue, clr_prev_rect, color
     canvas.delete(clr_prev_rect)
@@ -63,31 +77,36 @@ def setErase():
     shape = "Erase"
 
 def draw(e):
-    if shape == "Rectangle":
-        size = slider_rect.get()
-        canvas.create_rectangle(e.x, e.y, e.x+size, e.y+size, fill=color)
+    if e.y > 120:
+        if shape == "Rectangle":
+            size = slider_rect.get()
+            if e.y < h-120-size:
+                canvas.create_rectangle(e.x, e.y, e.x+size, e.y+size, fill=color)
 
-    if shape == "Oval":
-        size = slider_oval.get()
-        canvas.create_oval(e.x, e.y, e.x+size, e.y+size, fill=color)
+        if shape == "Oval":
+            size = slider_oval.get()
+            if e.y < h-120-size:
+                canvas.create_oval(e.x, e.y, e.x+size, e.y+size, fill=color)
 
-    if shape == "Erase":
-        size = slider_erase.get()
-        canvas.create_oval(e.x, e.y, e.x+size, e.y+size, fill="white", outline="white")
+        if shape == "Erase":
+            size = slider_erase.get()
+            if e.y < h-120-size:
+                canvas.create_oval(e.x, e.y, e.x+size, e.y+size, fill="white", outline="white")
 
-    if shape == "New Line":
-        global old_line_x, old_line_y, line_start
+        if shape == "New Line":
+            global old_line_x, old_line_y, line_start
 
-        if line_start == 0:
-            old_line_x = e.x
-            old_line_y = e.y
-            line_start = 1
+            if line_start == 0:
+                old_line_x = e.x
+                old_line_y = e.y
+                line_start = 1
 
-        elif line_start == 1:
-            size = slider_line.get()
-            canvas.create_line(old_line_x, old_line_y, e.x, e.y, width=size, fill=color)
-            old_line_x = e.x
-            old_line_y = e.y
+            elif line_start == 1:
+                size = slider_line.get()
+                if e.y < h-120:
+                    canvas.create_line(old_line_x, old_line_y, e.x, e.y, width=size, fill=color)
+                    old_line_x = e.x
+                    old_line_y = e.y
 
 draw_btn = tk.Button(canvas, text="Rectangle", command=setRect)
 draw_btn.place(x=100, y=h-115)
@@ -100,4 +119,5 @@ draw_btn.place(x=1000, y=h-115)
 
 canvas.bind("<Button-1>", draw)
 canvas.bind("<B1-Motion>", draw)
+drawGui()
 canvas.mainloop()
