@@ -14,5 +14,9 @@ with open(os.path.join(path, "novysubor.txt"), "w") as f:
         print(inp, file=f)
         inp = str(input("ZADAJ VETU BUZIK!"))
 
+with open(os.path.join(path, "text.txt"), "r") as f:
+    whole = f.read()
+    print(whole)
+
 
 
