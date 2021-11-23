@@ -2,7 +2,6 @@
 
 import os
 path = os.path.dirname(__file__)
-name = ""
 
 count_total = [0, 0, 0, 0, 0, 0]
 
@@ -24,13 +23,23 @@ def countVowels(row):
 def countVowelsTotal(count):
     return sum(count)
 
-while name == "":
-    name = str(input("Zadaj názov súboru: "))
+def openF():
+    name = ""
+    while name == "":
+        name = str(input("Zadaj názov súboru: "))
 
-with open(os.path.join(path, name + ".txt"), "r") as f:
-    for row in f:
-        print(f"{row} -> V tejto vete je {countVowelsTotal(countVowels(row))} samohlások!")
+    try:
+        with open(os.path.join(path, name + ".txt"), "r") as f:
+            for row in f:
+                print(f"{row} -> V tejto vete je {countVowelsTotal(countVowels(row))} samohlások!")
 
-print("------------------------------")
-vowels = ["A", "E", "I", "O", "U", "Y"]
-print(tuple(zip(vowels, count_total)))
+            print("------------------------------")
+            vowels = ["A", "E", "I", "O", "U", "Y"]
+            print(tuple(zip(vowels, count_total)))
+
+    except FileNotFoundError:
+        print("Súbor neexistuje :(")
+        openF()
+
+openF()
+

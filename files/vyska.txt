@@ -1,0 +1,7 @@
+Straka 3C 217 185 219 
+Babetka 1A 168 171 175 
+Vladikov 3D 200 201 195
+Novák 3C 199 200 170
+Kolesar 2B 188 172 177
+Vibral 1A 190 185 0
+Maly 2B 190 185 0
