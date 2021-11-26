@@ -5,10 +5,10 @@ def InsertionSort(array):
         j = 0
         while (j < i) and (array[j] < array[i]):
             j += 1
-        small = array[i]
+        sortedd = array[i]
         shift = array[j:i]
         array[j+1:i+1] = shift
-        array[j] = small
+        array[j] = sortedd
     return array
 
 print(InsertionSort(array))
