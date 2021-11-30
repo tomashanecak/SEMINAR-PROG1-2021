@@ -1,0 +1,6 @@
+3 2
+42 Kavka Peter
+21 Zaujec Vladimir
+19 Adamica Matej
+25 Urbanova Daniela
+33 Abrahamova Iveta
