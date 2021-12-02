@@ -22,7 +22,7 @@ def binarySearch(array, searching_for, length):
     right = length - 1
 
     while left <= right:
-        mid = int((right-left) / 2)
+        mid = int((right-left) / 2) 
 
         if array[mid] == searching_for:
             return f"Hľadaný prvok -> {searching_for} sa našiel na indexe -> {mid}"
@@ -38,4 +38,6 @@ arr = [random.randint(1,100) for i in range(10)]
 arr.sort()
 print(arr)
 print(binarySearch(arr, 10, len(arr)-1))
+
+
 

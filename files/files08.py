@@ -6,6 +6,8 @@ Vytvorte program pre takto definovanú hru, ktorý:
 
 """
 
+from abc import abstractmethod
+from math import _SupportsFloatOrIndex
 import os 
 import random 
 
