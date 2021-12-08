@@ -39,3 +39,5 @@ arr.sort()
 print(arr)
 print(binarySearch(arr, 10, len(arr)))
 
+
+
