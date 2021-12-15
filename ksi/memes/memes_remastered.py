@@ -2,15 +2,25 @@ import socket
 import pynetstring
 import base64
 import tkinter as tk
+from tkinter import *
 import os
 import re
+
+path = os.path.dirname(__file__)
 
 window = tk.Tk()
 window.title(string="--- MUNI MTP CLIENT ---")
 window.geometry("800x500")
+window.configure(bg="#424447")
+icon = tk.PhotoImage(file = os.path.join(path, 'icon.png'))
+window.iconphoto(False, icon)
+
+T = tk.Text(window, height = 5, width = 85)
+T.insert(tk.END, "")
+T.place(x=50,y=300)
 window.mainloop()
 
-path = os.path.dirname(__file__)
+
 
 HOST = '159.89.4.84'  # The server'mains hostname or IP address
 PORT = 42069       # The port used by the server
