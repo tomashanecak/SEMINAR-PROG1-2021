@@ -311,8 +311,12 @@ bg_color = "#ebb434"
 window.title(string="--- MUNI MTP CLIENT ---")
 window.geometry("800x500")
 window.configure(bg=bg_color)
-icon = tk.PhotoImage(file = os.path.join(path, 'icon.png'))
-window.iconphoto(False, icon)
+
+try:
+    icon = tk.PhotoImage(file = os.path.join(path, 'icon.png'))
+    window.iconphoto(False, icon)
+except:
+    pass
 
 IP_LABEL = Label(window, text="IP Address: ", bd=8)
 IP_LABEL.config(bg=bg_color)
