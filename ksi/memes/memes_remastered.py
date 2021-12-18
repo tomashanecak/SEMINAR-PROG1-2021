@@ -52,7 +52,15 @@ def sendMeme():
     nick = NICKNAME_ENTRY.get()
     password = PASSWORD_ENTRY.get()
     description = DESCRIPTION_ENTRY.get("1.0",'end-1c')
-    isNSFW = "false" #todo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    if nsfw_state.get() == 0:
+        isNSFW = "false"
+    elif nsfw_state.get() == 1:
+        isNSFW = "true"
+    else:
+        print("Internal Error With NSFW function, restart app")
+        terminalOutput("Internal Error With NSFW function, restart app", terminal)
+        return 0
 
     # Check if everything is filled out (CORRECTLY!!) before establishing connection
     if len(encoded_meme) == 0:
@@ -237,8 +245,11 @@ def sendMeme():
                 print("Data Size Check Passed")
                 terminalOutput("Data Size Check Passed\n", terminal)
             else:
-                print("Error 4 Lost Packets !!!")
-                terminalOutput("Error 4 Lost Packets !!!\n", terminal)
+                print("WARNING 4 Lost Packets !!!")
+                terminalOutput("WARNING 4 Lost Packets !!!\n", terminal)
+                print("There was a problem sending your meme --- TERMINATING CONNECTION ---")
+                terminalOutput("There was a problem sending your meme --- TERMINATING CONNECTION ---\n", terminal)
+                return 0
         else:
             print('Server NOT Responding XO -> Server Error')
             terminalOutput('Server NOT Responding XO -> Server Error\n', terminal)
