@@ -4,10 +4,8 @@ import base64
 import tkinter as tk
 from tkinter import *
 from tkinter.filedialog import askopenfile
-import subprocess
 import os
 import re
-import sys
 
 path = os.path.dirname(__file__)
 window = tk.Tk()
@@ -39,60 +37,111 @@ def memeBrowse():
     encoded_meme = base64.b64encode(open(f"{meme_path}", "rb").read()).decode("ascii")
 
 
-#__________________________SEND MEME FUNCTION TAKES CARE OF COMMUNICATION WITH REMOTE SERVER AND SENDING MEME _________________________
+# __________________________ SEND MEME FUNCTION TAKES CARE OF COMMUNICATION WITH REMOTE SERVER AND SENDING MEME _________________________
 def sendMeme():
     # ------------------------------------- Get Values from Text Boxes -----------------------------------
 
-    HOST = str(IP_ENTRY.get())  # The server'mains hostname or IP address
-    PORT = int(PORT_ENTRY.get())       # The port used by the server
+    try:
+        HOST = str(IP_ENTRY.get())  # The server'mains hostname or IP address
+        PORT = int(PORT_ENTRY.get())       # The port used by the server
+    except ValueError:
+        print("Check IP and PORT! Something is filled out incorrectly")
+        terminalOutput("Check IP and PORT! Something is filled out incorrectly", terminal)
+        return 0
 
     nick = NICKNAME_ENTRY.get()
     password = PASSWORD_ENTRY.get()
     description = DESCRIPTION_ENTRY.get("1.0",'end-1c')
     isNSFW = "false" #todo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    # Check if everything is filled out (CORRECTLY!!) before establishing connection
+    if len(encoded_meme) == 0:
+        print("Please Select MEME")
+        terminalOutput("Please Select MEME", terminal)
+        return 0
+    
+    if len(HOST) == 0:
+        print("Please fill out IP Address")
+        terminalOutput("Please fill out IP Address", terminal)
+        return 0
+
+    if len(str(PORT)) == 0:
+        print("Please fill out port")
+        terminalOutput("Please fill out port", terminal)
+        return 0
+
+    if len(nick) == 0:
+        print("Please fill out your nickname")
+        terminalOutput("Please fill out your nickname", terminal)
+        return 0
+
+    if len(password) == 0:
+        print("Please fill out your password")
+        terminalOutput("Please fill out your password", terminal)
+        return 0
+
+    if len(description) == 0:
+        print("Please fill out description")
+        terminalOutput("Please fill out description", terminal)
+        return 0
+
     # ------------------------------------------------------
     # Main Channel Communication
     # ------------------------------------------------------
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as mains:
-        mains.connect((HOST, PORT))
+        try:
+            mains.connect((HOST, PORT))
+        except:
+            print("Cant Connect to server -> Check IP and PORT")
+            terminalOutput("Cant Connect to server -> Check IP and PORT\n", terminal)
 
 
         # Check If Server Responds
         mains.sendall(pynetstring.encode('C MTP V:1.0'))
         data = mains.recv(1024)
-        print('Server Alive Received ->', repr(data.decode()))
-        terminalOutput(f"server alive -> {repr(data.decode())} \n", terminal)
 
         if pynetstring.decode(data) != [b'S MTP V:1.0']:
             print("Server Not Alive -> Error 404")
             terminalOutput("Server Not Alive -> Error 404\n", terminal)
+        else:
+            print('Server Alive Received ->', repr(data.decode()))
+            terminalOutput(f"Server Alive Received -> {repr(data.decode())} \n", terminal)
 
-
+        
         # Get Auth Token
         mains.sendall(pynetstring.encode(f"C <{nick}>"))
         data = mains.recv(1024)
         auth_token = pynetstring.decode(data)
-        print('Auth Token Generated ->', repr(data))
-        terminalOutput(f"Auth Token Generated -> {repr(data)}\n", terminal)
 
         if str(pynetstring.decode(data)) == "":
             print("Auth Token Not Received -> Auth Error")
             terminalOutput("Auth Token Not Received -> Auth Error\n", terminal)
+        else:
+            print('Auth Token Generated ->', repr(data))
+            terminalOutput(f"Auth Token Generated -> {repr(data)}\n", terminal)
 
         
-
         # Get DataChannel Port
         data = mains.recv(1024)
         data_channel_port = int(str(pynetstring.decode(data))[4:10])
-        print('Data Chanel Port Received ->', repr(data))
-        terminalOutput(f"Data Chanel Port Received -> {repr(data)}\n", terminal)
+        if str(pynetstring.decode(data)) == "":
+            print("Data Chanel Port NOT Received -> Server Error")
+            terminalOutput("Data Chanel Port NOT Received -> Server Error\n", terminal)
+        else:
+            print('Data Chanel Port Received ->', repr(data))
+            terminalOutput(f"Data Chanel Port Received -> {repr(data)}\n", terminal)
+
         
         #------------------------------------------------------------
         # Beggining of Data Channel communication
         #-----------------------------------------------------------
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as datas:
-            datas.connect((HOST, data_channel_port))
+            try:
+                datas.connect((HOST, data_channel_port))
+            except:
+                print("Can´t connect to Data Channel -> Internal Application Error")
+                terminalOutput("Can´t connect to Data Channel -> Internal Application Error\n", terminal)
+            
 
             #Get Second Token
             datas.sendall(pynetstring.encode(f"C <{nick}>"))
@@ -101,7 +150,7 @@ def sendMeme():
             if auth_token != pynetstring.decode(data):
                 print("Auth Tokens not Equal Error!!!")
                 terminalOutput("Auth Tokens not Equal Error!!!\n", terminal)
-                exit()
+                return 0
             else:
                 print('--- Auth Token Validation Pass! ---', repr(data))
                 print("-----------------------------------------------------------------------------")
@@ -112,8 +161,13 @@ def sendMeme():
             #Get data type from server
             def getDataType():
                 data = datas.recv(1024)
-                print('Data Type Received ->', repr(data))
-                terminalOutput(f'Data Type Received -> {repr(data)}\n', terminal)
+                if len(data) == 0:
+                    print('Data Type NOT Received -> Server Error')
+                    terminalOutput('Data Type NOT Received -> Server Error\n', terminal)
+                    return 0
+                else:
+                    print('Data Type Received ->', repr(data))
+                    terminalOutput(f'Data Type Received -> {repr(data)}\n', terminal)
 
             # Get Received Packet size
             def getReceivedPacketSize(data):
@@ -124,9 +178,14 @@ def sendMeme():
             def sendReceivePackets(data_to_send, type):
                 datas.sendall(pynetstring.encode(f"C {data_to_send}"))
                 data = str(pynetstring.decode(datas.recv(1024)))
-                print(f'{type} type was sent with Server Response Message ->', repr(data))
-                terminalOutput(f'{type} type was sent with Server Response Message -> {repr(data)}\n', terminal)
-                getReceivedPacketSize(data)
+                if len(data) == 0:
+                    print('Server NOT Responding XO -> Server Error')
+                    terminalOutput('Server NOT Responding XO -> Server Error\n', terminal)
+                    return 0
+                else:
+                    print(f'{type} type was sent with Server Response Message ->', repr(data))
+                    terminalOutput(f'{type} type was sent with Server Response Message -> {repr(data)}\n', terminal)
+                    getReceivedPacketSize(data)
 
             getDataType()
 
@@ -150,29 +209,40 @@ def sendMeme():
 
             # Receive Data Token
             data = str(datas.recv(1024))
-            print('Data Secret Token Received ->', repr(data))
-            terminalOutput(f'Data Secret Token Received -> {repr(data)}\n', terminal)
-            # Get Data Token from received message
-            start = data.find("END:") + len("END:") ; end = data.find(",")
-            d_token = data[start:end]
+            if len(data) > 0:
+                print('Data Secret Token Received ->', repr(data))
+                terminalOutput(f'Data Secret Token Received -> {repr(data)}\n', terminal)
+                # Get Data Token from received message
+                start = data.find("END:") + len("END:") ; end = data.find(",")
+                d_token = data[start:end]
 
-            datas.close
+                datas.close
+            else:
+                print('Server NOT Responding XO -> Server Error')
+                terminalOutput('Server NOT Responding XO -> Server Error\n', terminal)
+                return 0
+
 
 
         # Receive Data sent size for verification
         data = str(mains.recv(1024))
-        # Get size from received packet
-        start = data.find("S ") + len("S ") ; end = data.find(",")
-        s_calc_size = int(data[start:end])
-        print(f'All Data Sent Size was -> {msg_size}', f"Server Calculated ->{repr(s_calc_size)}")
-        terminalOutput(f'All Data Sent Size was -> {msg_size} Server Calculated ->{repr(s_calc_size)}\n', terminal)
-        # Check Data sizes
-        if s_calc_size == msg_size:
-            print("Data Size Check Passed")
-            terminalOutput("Data Size Check Passed\n", terminal)
+        if len(data) > 0:
+            # Get size from received packet
+            start = data.find("S ") + len("S ") ; end = data.find(",")
+            s_calc_size = int(data[start:end])
+            print(f'All Data Sent Size was -> {msg_size}', f"Server Calculated ->{repr(s_calc_size)}")
+            terminalOutput(f'All Data Sent Size was -> {msg_size} Server Calculated ->{repr(s_calc_size)}\n', terminal)
+            # Check Data sizes
+            if s_calc_size == msg_size:
+                print("Data Size Check Passed")
+                terminalOutput("Data Size Check Passed\n", terminal)
+            else:
+                print("Error 4 Lost Packets !!!")
+                terminalOutput("Error 4 Lost Packets !!!\n", terminal)
         else:
-            print("Error 4 Lost Packets !!!")
-            terminalOutput("Error 4 Lost Packets !!!\n", terminal)
+            print('Server NOT Responding XO -> Server Error')
+            terminalOutput('Server NOT Responding XO -> Server Error\n', terminal)
+            return 0
 
 
         # Send Data Token to server to terminate connection
@@ -180,17 +250,22 @@ def sendMeme():
 
         # Check S ACK if session was terminated
         data = str(mains.recv(1024))
-        print(f"Message from server received stating -> {data}")
-        print("--------------------------------------------------------------------------------")
-        terminalOutput(f"Message from server received stating -> {data}\n", terminal)
-        terminalOutput("--------------------------------------------------------------------------------\n", terminal)
-        if "S ACK" in data:
-            print("Meme was Sent Succesfully --- CONNECTION TERMINATED BY SERVER ---")
-            terminalOutput("Meme was Sent Succesfully --- CONNECTION TERMINATED BY SERVER ---\n", terminal)
+        if len(data) > 0:
+            print(f"Message from server received stating -> {data}")
+            print("--------------------------------------------------------------------------------")
+            terminalOutput(f"Message from server received stating -> {data}\n", terminal)
+            terminalOutput("--------------------------------------------------------------------------------\n", terminal)
+            if "S ACK" in data:
+                print("Meme was Sent Succesfully --- CONNECTION TERMINATED BY SERVER ---")
+                terminalOutput("Meme was Sent Succesfully --- CONNECTION TERMINATED BY SERVER ---\n", terminal)
+            else:
+                print("There was a problem sending your meme --- TERMINATING CONNECTION ---")
+                terminalOutput("There was a problem sending your meme --- TERMINATING CONNECTION ---\n", terminal)
+                mains.close()
         else:
-            print("There was a problem sending your meme --- TERMINATING CONNECTION ---")
-            terminalOutput("There was a problem sending your meme --- TERMINATING CONNECTION ---\n", terminal)
-            mains.close()
+            print('Server NOT Responding XO -> Server Error')
+            terminalOutput('Server NOT Responding XO -> Server Error\n', terminal)
+            return 0
         
         terminalOutput("********************************************************************\n", terminal)
 
