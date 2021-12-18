@@ -141,7 +141,7 @@ def sendMeme():
 
         
         # Get Auth Token
-        mains.sendall(pynetstring.encode(f"C <{nick}>"))
+        mains.sendall(pynetstring.encode(f"C {nick}"))
         data = mains.recv(1024)
         auth_token = pynetstring.decode(data)
 
@@ -176,8 +176,9 @@ def sendMeme():
             
 
             #Get Second Token
-            datas.sendall(pynetstring.encode(f"C <{nick}>"))
+            datas.sendall(pynetstring.encode(f"C {nick}"))
             data = datas.recv(1024)
+            print(data)
             
             if auth_token != pynetstring.decode(data):
                 print("Auth Tokens not Equal Error!!!")
