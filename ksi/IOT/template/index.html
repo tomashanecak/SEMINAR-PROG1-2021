@@ -4,28 +4,56 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5">
     <title>Smart Home</title>
 </head>
 <body>
 
-{% for light_id in light_ids %}
-<button onclick="$.get('http://home_automation.iamroot.eu/device/{{ light_id }}/toggle');  location.reload();">
+{% for i in range(0, 5) %}
+<div style="border: 1px solid black; padding: 10px;">
+
+<h3>Svetlo číslo {{i + 1}}.</h3>
+<p>Majiteľ: {{owners[i]}}</p>
+
+<button onclick="$.get('http://home_automation.iamroot.eu/device/{{ light_ids[i] }}/toggle');  location.reload();">
     Prepnúť Svetlo
 </button>
 
 <br>
-{% endfor %}
+<br>
 
-{% for light_state in light_states %}
-
-{% if light_state == true %}
-<p style="color: green;"> Zapnuté </p>
+{% if light_states[i] == true %}
+<p style="display: inline;">Stav Svetla: <p style="color: green; display: inline;"> Zapnuté </p> </p>
 {% else %}
-<p style="color: red;"> Vypnuté </p>
+<p style="display: inline;">Stav Svetla: <p style="color: red; display: inline;"> Vypnuté </p> </p>
 {% endif %}
 
-{% endfor %}
-    
+<p>Teplota Svetla: {{ light_temperatures[i] }}</p>
+
+<p>Spotreba Energie: {{ light_usages[i] }} W</p>
+
+{% if total_usage != 0 %}
+<p>Časť účtu za Energiu: {{ (light_usages[i] / total_usage)*100 }}%</p>
+{% else %}
+<p>Časť účtu za Energiu: 0%</p>
+{% endif %}
+
+<button onclick="$.get('http://home_automation.iamroot.eu/device/{{ light_ids[i] }}/color_temperature/10000');  location.reload();">
+    Nastaviť chladnejšiu teplotu
+</button>
+
+<button onclick="$.get('http://home_automation.iamroot.eu/device/{{ light_ids[i] }}/color_temperature/5000');  location.reload();">
+    Nastaviť pôvodnú teplotu
+</button>
+
+<button onclick="$.get('http://home_automation.iamroot.eu/device/{{ light_ids[i] }}/color_temperature/3500');  location.reload();">
+    Nastaviť teplejšiu teplotu
+</button>
+
+</div>
+
+<br>
+{% endfor %} 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
