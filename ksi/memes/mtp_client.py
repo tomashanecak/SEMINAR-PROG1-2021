@@ -1,3 +1,4 @@
+# coding=UTF-8
 # ********************************************************************************************************
 # AUTHOR: Tomáš Hanečák, Gymnázium Park mládeže 5, Košice :)
 # Final Version Created 18.12.2021
