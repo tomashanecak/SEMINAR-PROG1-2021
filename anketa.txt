@@ -1,0 +1,7 @@
+Otazka jeden? 10 15 4
+
+Otazka dva? 12 14 8
+
+Otazka tri? 9 7 3
+
+Otazka styri? 0 10 5
