@@ -8,8 +8,10 @@ directions = ["vlavo", "vpravo", "hore", "dole"]
 direction = "vpravo"
 x, y = w/2, h/2
 
+text = canvas.create_text(100, 10, text="Aktualny smer -> vpravo")
+
 def draw():
-    global direction, x, y
+    global direction, x, y, text
 
     entry_value = (entry.get()).split(" ")
     try:
@@ -31,11 +33,13 @@ def draw():
         raise Exception
     except:
         print("Neplatny prikaz!!!")
+    dir_text = "Aktualny smer -> " + direction
+    canvas.delete(text)
+    text = canvas.create_text(100, 10, text=dir_text)
 
 entry = Tk.Entry(canvas)
 entry.place(x= w/2 - 80, y= h-100)
 button = Tk.Button(canvas, text="Execute", command=draw)
 button.place(x= w/2 - 42, y= h-50)
-
 
 canvas.mainloop()
